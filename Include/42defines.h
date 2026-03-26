@@ -244,7 +244,7 @@
 #define CMG_FSW 7
 #define THR_FSW 8
 #define CFS_FSW 9
-#define ROVER_FSW 10
+#define HEXAPOD_FSW 10
 #define LUNARCOMM_FSW 11
 
 /* Command Types */

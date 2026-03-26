@@ -1087,8 +1087,10 @@ struct ConstellationType {
 };
 
 struct AntPattType {
-   double PeakGain; /* [dB] */
-   double FloorGain; /* [dB] */
+   double PeakGain; /* [[dB]] */
+   double FloorGain; /* [[dB]] */
+   double MinRad; 
+   double MeshScl;
    long MeshTag;
 };
 
@@ -1115,6 +1117,7 @@ struct CommLinkType {
    long MaxOutCtr;
    long OutCtr;
    long OutEnabled;
+   long PosAdjustEnabled;
    double DelayTol; /* [[sec]] */
    
    long LinkType; /* UPLINK (Gnd->SC),DOWNLINK(SC->Gnd),CROSSLINK(SC->SC) */
@@ -1142,6 +1145,7 @@ struct CommLinkType {
 
    double Freq; /* [[Hz]] */
    double Wavelength; /* [[m]] */
+   double NoiseFloor; /* [[dBw]] */
    
    double TxPower; /* [[dBw]] */
    char TxAntFileName[80];
@@ -1156,7 +1160,7 @@ struct CommLinkType {
    double PathLoss; /* [[dB]] */
 
    char RxAntFileName[80];
-   double RxNoisePower; /* [[dB]] */
+   double RxNoisePower; /* [[dBw]] */
 
    double AtmoMean; /* [[dB]] */
    double AtmoStd; /* [[dB]] */

@@ -1858,7 +1858,7 @@ void LegPartials(struct SCType *S, long Il, double J[3][3])
       J[2][2] = l2*(c2*s3+c3*s2);
 }
 /**********************************************************************/
-void RoverFSW(struct SCType *S)
+void HexapodFSW(struct SCType *S)
 {
       struct AcType *AC;
       struct BodyType *B;
@@ -1900,8 +1900,8 @@ void RoverFSW(struct SCType *S)
          Init = 0;
          FindPDGains(S->mass,0.2*TwoPi,1.0,&Krx,&Kpx);
          FindPDGains(S->I[2][2],0.2*TwoPi,0.7,&Kra,&Kpa);
-         wx = TwoPi/1000.0;
-         wy = TwoPi/700.0;
+         wx = TwoPi/300.0;
+         wy = TwoPi/150.0;
       }
       
 /* .. Position, Orientation in Region */
@@ -1914,14 +1914,13 @@ void RoverFSW(struct SCType *S)
       
 /* .. Generate position and attitude commands from path */
       
-      PosCmd[0] = 20.0*sin(wx*SimTime);
-      PosCmd[1] = 15.0*sin(wy*SimTime);
-      VelCmd[0] = 20.0*wx*cos(wx*SimTime);
-      VelCmd[1] = 15.0*wy*cos(wy*SimTime);
+      PosCmd[0] =  20.0*sin(wx*SimTime);
+      PosCmd[1] =  10.0*sin(wy*SimTime);
+      VelCmd[0] =  20.0*wx*cos(wx*SimTime);
+      VelCmd[1] =  10.0*wy*cos(wy*SimTime);
       
       PosCmd[2] = 0.5;
       VelCmd[2] = 0.0;
-      YawCmd = atan2(VelCmd[1],VelCmd[0]);
       PitchCmd = 0.0;
       RollCmd = 0.0;
       
@@ -1932,18 +1931,20 @@ void RoverFSW(struct SCType *S)
       }
       MxV(CBR,PosErrR,PosErrB);
       MagPosErr = MAGV(PosErrB);
-      if (MagPosErr > 1.0) {
-         YawErr = Yaw + PosErrB[1]/MagPosErr;
+      if (MagPosErr > 2.0) {
+         YawCmd = atan2(-PosErrR[1],-PosErrR[0]);
+         YawErr = Yaw - YawCmd;
          while (YawErr < -Pi) YawErr += TwoPi;
-         while (Yaw > Pi) YawErr -= TwoPi;
-         YawRateCmd = Limit(-0.5*YawErr,-0.25,0.25);
+         while (YawErr > Pi) YawErr -= TwoPi;
+         YawRateCmd = Limit(-0.5*YawErr,-0.1,0.1);
          if (fabs(YawErr) > 0.25) SpdCmd = 0.1*MaxSpd;
          else SpdCmd = MaxSpd;
       }
       else {
+         YawCmd = atan2(VelCmd[1],VelCmd[0]);
          YawErr = Yaw - YawCmd + 0.2*PosErrB[1]/MagPosErr;
          while (YawErr < -Pi) YawErr += TwoPi;
-         while (Yaw > Pi) YawErr -= TwoPi;
+         while (YawErr > Pi) YawErr -= TwoPi;
          YawRateCmd = Limit(-0.5*YawErr,-0.1,0.1);
          SpdCmd = MAGV(VelCmd) - 0.5*PosErrB[0];
       }
@@ -2109,7 +2110,7 @@ void LunarCommFSW(struct SCType *S)
       for(i=0;i<3;i++) ViewAxisN[i] = GndPosN[i] - S->PosN[i];
       UNITV(ViewAxisN);
       MxV(S->B[0].CN,ViewAxisN,ViewAxisB);
-      PointGimbalToTarget(21,S->G[0].CGiBi,S->G[0].CBoGo,ViewAxisB,Zvec,GimCmd);
+      PointGimbalToTarget(12,S->G[0].CGiBi,S->G[0].CBoGo,ViewAxisB,Zvec,GimCmd);
       for(i=0;i<2;i++) {
          AC->G[0].GCmd.Ang[i] = GimCmd[i];
          AngErr[i] = AC->G[0].Ang[i] - AC->G[0].GCmd.Ang[i];
@@ -2168,8 +2169,8 @@ void FlightSoftWare(struct SCType *S)
             case THR_FSW:
                ThrFSW(S);
                break;
-            case ROVER_FSW:
-               RoverFSW(S);
+            case HEXAPOD_FSW:
+               HexapodFSW(S);
                break;
             case LUNARCOMM_FSW:
                LunarCommFSW(S);

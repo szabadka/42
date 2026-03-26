@@ -227,22 +227,23 @@ void WriteCommLinkToCsv(void)
                   outfile[Il] = FileOpen(InOutPath,FileName,"w");
 
                   L->OutCtr = 1000000000;
-                  fprintf(outfile[Il],"L_Time");
-                  fprintf(outfile[Il],",L_Doppler");
-                  fprintf(outfile[Il],",L_Loss");
-                  fprintf(outfile[Il],",L_Delay");
-                  fprintf(outfile[Il],",L_Carrier");
-                  fprintf(outfile[Il],",L_Noise");
-                  fprintf(outfile[Il],",L_CNR");
-                  fprintf(outfile[Il],",L_EIRP");
-                  fprintf(outfile[Il],",L_PwrFluxDens");
-                  fprintf(outfile[Il],",L_Range");
-                  fprintf(outfile[Il],",L_RangeRate");
-                  fprintf(outfile[Il],",L_TxAntGain");
-                  fprintf(outfile[Il],",L_RxAntGain");
-                  fprintf(outfile[Il],",L_TxOcculted");
-                  fprintf(outfile[Il],",L_RxOcculted");
-                  fprintf(outfile[Il],",L_PathIsOcculted");
+                  fprintf(outfile[Il],"Time");
+                  fprintf(outfile[Il],",Doppler");
+                  fprintf(outfile[Il],",Loss");
+                  fprintf(outfile[Il],",Delay");
+                  fprintf(outfile[Il],",Carrier");
+                  fprintf(outfile[Il],",Noise");
+                  fprintf(outfile[Il],",CNR");
+                  fprintf(outfile[Il],",EIRP");
+                  fprintf(outfile[Il],",FSPL");
+                  fprintf(outfile[Il],",PwrFluxDens");
+                  fprintf(outfile[Il],",Range");
+                  fprintf(outfile[Il],",RangeRate");
+                  fprintf(outfile[Il],",TxAntGain");
+                  fprintf(outfile[Il],",RxAntGain");
+                  fprintf(outfile[Il],",TxOcculted");
+                  fprintf(outfile[Il],",RxOcculted");
+                  fprintf(outfile[Il],",PathIsOcculted");
                   fprintf(outfile[Il],"\n");
                }
             }
@@ -262,6 +263,7 @@ void WriteCommLinkToCsv(void)
                   fprintf(outfile[Il],",%18.12le",L->Noise);
                   fprintf(outfile[Il],",%18.12le",L->CNR);
                   fprintf(outfile[Il],",%18.12le",L->EIRP);
+                  fprintf(outfile[Il],",%18.12le",L->FreeSpacePathLoss);
                   fprintf(outfile[Il],",%18.12le",L->PowerFluxDensity);
                   fprintf(outfile[Il],",%18.12le",L->Range);
                   fprintf(outfile[Il],",%18.12le",L->RangeRate);

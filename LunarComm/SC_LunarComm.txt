@@ -2,7 +2,7 @@
 Simple generic S/C          !  Description
 "S/C"                       !  Label
 GenScSpriteAlpha.ppm        !  Sprite File Name
-LUNARCOMM_FSW                !  Flight Software Identifier
+LUNARCOMM_FSW               !  Flight Software Identifier
 0.2                         !  FSW Sample Time, sec
 ************************* Orbit Parameters ****************************
 FIXED                       !  Orbit Prop FIXED, EULER_HILL, ENCKE, or COWELL
@@ -53,7 +53,7 @@ NONE                        ! Flex File Name
 ============================== Joint 0 ================================
 ACTUATED                    ! Type of joint (PASSIVE, ACTUATED, others)
 0 1                         ! Inner, outer body indices
-2   213   GIMBAL            ! RotDOF, Seq, GIMBAL or SPHERICAL
+2   123   GIMBAL            ! RotDOF, Seq, GIMBAL or SPHERICAL
 0   123                     ! TrnDOF, Seq
 FALSE  FALSE  FALSE         ! RotDOF Locked
 FALSE  FALSE  FALSE         ! TrnDOF Locked

@@ -1916,7 +1916,7 @@ void OpaquePass(void)
          if (R->Exists && R->World == POV.Host.World) {
             glPushMatrix();
             glMultMatrixf(R->ModelMatrix);
-            DrawCmdPath();
+            /* DrawCmdPath(); */
             if (ShadowsEnabled) {
                MxM4f(ShadowFromNMatrix,R->ModelMatrix,ShadowMatrix);
                glUniformMatrix4fv(ShadowMatrixLoc,1,0,ShadowMatrix);

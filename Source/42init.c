@@ -142,7 +142,7 @@ long DecodeString(char *s)
       else if (!strcmp(s,"CMG_FSW")) return CMG_FSW;
       else if (!strcmp(s,"THR_FSW")) return THR_FSW;
       else if (!strcmp(s,"CFS_FSW")) return CFS_FSW;
-      else if (!strcmp(s,"ROVER_FSW")) return ROVER_FSW;
+      else if (!strcmp(s,"HEXAPOD_FSW")) return HEXAPOD_FSW;
       else if (!strcmp(s,"LUNARCOMM_FSW")) return LUNARCOMM_FSW;
 
       else if (!strcmp(s,"PHOBOS")) return PHOBOS;

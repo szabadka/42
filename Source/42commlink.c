@@ -40,7 +40,7 @@ long IsOcculted(double Pos[3], double Dir[3], double Range, double rad)
       PoD = VoV(PosDir,Dir);
       RbyP = rad/P;
 
-      if (PoD < 0.0 && RbyP*RbyP > 1.0-PoD*PoD) return(1);
+      if (PoD < 0.0 && RbyP*RbyP > 1.0-PoD*PoD && Range > -P*PoD) return(1);
       else return(0);
 }
 /******************************************************************************/
@@ -251,7 +251,7 @@ void LinkGeometry(struct CommLinkType *L)
          }
          dt = L->Delay - PrevDelay;
          PrevDelay = L->Delay;
-      } while(fabs(dt) > L->DelayTol);
+      } while(L->PosAdjustEnabled && fabs(dt) > L->DelayTol);
       
       /* Find RangeRate, Doppler */
       if (L->TxWorld == L->RxWorld) {
@@ -262,7 +262,7 @@ void LinkGeometry(struct CommLinkType *L)
             RelVelN[i] = L->TxVelN[i] - L->RxVelN[i];
          }
          L->RangeRate = VoV(RelVelN,L->RxPathDirN);
-         L->Doppler = -L->RangeRate/SPEED_OF_LIGHT;
+         L->Doppler = -L->RangeRate/SPEED_OF_LIGHT*L->Freq;
       }
       else {
          MxV(Wtx->CNH,L->TxPathDirH,L->TxPathDirN);
@@ -272,7 +272,7 @@ void LinkGeometry(struct CommLinkType *L)
          }
          MxV(Wrx->CNH,L->RxPathDirH,L->RxPathDirN);
          L->RangeRate = VoV(RelVelH,L->RxPathDirH);
-         L->Doppler = -L->RangeRate/SPEED_OF_LIGHT;
+         L->Doppler = -L->RangeRate/SPEED_OF_LIGHT*L->Freq;
       }
 
       /* Check for occultation */
@@ -307,72 +307,47 @@ void AtmoLossModel(struct CommLinkType *L)
       }
 }
 /******************************************************************************/
-void TxPerformance(struct CommLinkType *L)
+double AntGain(struct AntPattType *A, double CAN[3][3], double PathDirN[3])
 {
-      struct AntPattType *A;
       struct MeshType *M;
       double ViewPt[3],ViewDir[3];
-      double TxPathDirA[3],ProjPt[3];
+      double PathDirA[3],ProjPt[3];
+      double AntGain;
       long Ip,FoundPoly;
       long i;
 
-      A = &L->TxAntPatt;
       M = &Mesh[A->MeshTag];
 
 /* .. Antenna Gain */
-      MxV(L->TxCAN,L->TxPathDirN,TxPathDirA);
+      MxV(CAN,PathDirN,PathDirA);
       for(i=0;i<3;i++) {
-         ViewPt[i] = 2.0*M->BBox.radius*TxPathDirA[i];
-         ViewDir[i] = -TxPathDirA[i];
+         ViewPt[i] = 2.0*M->BBox.radius*PathDirA[i];
+         ViewDir[i] = -PathDirA[i];
       }
       FoundPoly = OCProjectRayOntoMesh(ViewPt,ViewDir,
          M,ProjPt,&Ip);
       if (FoundPoly) {
-         L->TxAntGain = (A->PeakGain-A->FloorGain)*MAGV(ProjPt)+A->FloorGain;
+         AntGain = A->MeshScl*(MAGV(ProjPt)-A->MinRad)+A->FloorGain;
       }
       else {
-         L->TxAntGain = A->FloorGain;
+         AntGain = A->FloorGain;
       }
-}
-/******************************************************************************/
-void RxPerformance(struct CommLinkType *L)
-{
-      struct AntPattType *A;
-      struct MeshType *M;
-      double ViewPt[3],ViewDir[3];
-      double RxPathDirA[3],ProjPt[3];
-      long Ip,FoundPoly;
-      long i;
-
-      A = &L->RxAntPatt;
-      M = &Mesh[A->MeshTag];
-
-/* .. Antenna Gain */
-      MxV(L->RxCAN,L->RxPathDirN,RxPathDirA);
-      for(i=0;i<3;i++) {
-         ViewPt[i] = 2.0*M->BBox.radius*RxPathDirA[i];
-         ViewDir[i] = -RxPathDirA[i];
-      }
-      FoundPoly = OCProjectRayOntoMesh(ViewPt,ViewDir,
-         M,ProjPt,&Ip);
-      if (FoundPoly) {
-         L->RxAntGain = (A->PeakGain-A->FloorGain)*MAGV(ProjPt)+A->FloorGain;
-      }
-      else {
-         L->RxAntGain = A->FloorGain;
-      }
+      
+      return(AntGain);
 }
 /******************************************************************************/
 void LoadLinkFile(void)
 {
       FILE *infile;
-      long Il,Seq;
+      long Il,Iv,Seq;
       long EdgesEnabled = 1;
       double ang1,ang2,ang3;
-      double RangeTol;
-      double dt;
+      double dt,r;
+      double MaxRad;
       char response[80],junk[80],newline;
       struct CommLinkType *L;
+      struct AntPattType *A;
+      struct MeshType *M;
       long Seed;
       long OldNmesh;
 
@@ -395,13 +370,14 @@ void LoadLinkFile(void)
          }
          else L->MaxOutCtr = (long) (dt/DTSIM+0.5);
 
-         fscanf(infile,"%lf %[^\n] %[\n]",&RangeTol,junk,&newline); 
-         L->DelayTol = RangeTol/SPEED_OF_LIGHT;
+         fscanf(infile,"%s %lf %[^\n] %[\n]",response,&L->DelayTol,junk,&newline); 
+         L->PosAdjustEnabled = DecodeString(response);
 
          fscanf(infile,"%s %[^\n] %[\n]",response,junk,&newline); 
          L->LinkType = DecodeString(response);
          fscanf(infile,"%lf %[^\n] %[\n]",&L->Freq,junk,&newline);
          L->Wavelength = SPEED_OF_LIGHT/L->Freq;
+         fscanf(infile,"%lf %[^\n] %[\n]",&L->NoiseFloor,junk,&newline);         
          fscanf(infile,"%ld %ld %[^\n] %[\n]",&L->TxID,&L->TxBody,junk,&newline);
          fscanf(infile,"%lf %lf %lf %ld %[^\n] %[\n]",
             &ang1,&ang2,&ang3,&Seq,junk,&newline);   
@@ -427,10 +403,43 @@ void LoadLinkFile(void)
          Mesh = LoadWingsObjFile(ModelPath,L->TxAntFileName,
             &Matl,&Nmatl,Mesh,&Nmesh,&L->TxAntPatt.MeshTag,EdgesEnabled);
          if (OldNmesh != Nmesh) LoadOctree(&Mesh[Nmesh-1]);
+         
+         A = &L->TxAntPatt;
+         M = &Mesh[A->MeshTag];
+         A->MinRad = 1.0E9;
+         MaxRad = 0.0;
+         for(Iv=0;Iv<M->Nv;Iv++) {
+            r = MAGV(M->V[Iv]);
+            if (r > MaxRad) MaxRad = r;
+            if (r < A->MinRad) A->MinRad = r;
+         }
+         if (fabs(MaxRad-A->MinRad) < 1.0E-3*MaxRad) { /* Trap isotropic pattern */
+            A->MeshScl = 0.0;
+         }
+         else {
+            A->MeshScl = (A->PeakGain-A->FloorGain)/(MaxRad-A->MinRad);
+         }
+         
          OldNmesh = Nmesh;
          Mesh = LoadWingsObjFile(ModelPath,L->RxAntFileName,
             &Matl,&Nmatl,Mesh,&Nmesh,&L->RxAntPatt.MeshTag,EdgesEnabled);
          if (OldNmesh != Nmesh) LoadOctree(&Mesh[Nmesh-1]);
+
+         A = &L->RxAntPatt;
+         M = &Mesh[A->MeshTag];
+         A->MinRad = 1.0E9;
+         MaxRad = 0.0;
+         for(Iv=0;Iv<M->Nv;Iv++) {
+            r = MAGV(M->V[Iv]);
+            if (r > MaxRad) MaxRad = r;
+            if (r < A->MinRad) A->MinRad = r;
+         }
+         if (fabs(MaxRad-A->MinRad) < 1.0E-3*MaxRad) { /* Trap isotropic pattern */
+            A->MeshScl = 0.0;
+         }
+         else {
+            A->MeshScl = (A->PeakGain-A->FloorGain)/(MaxRad-A->MinRad);
+         }
       }
       
       fclose(infile);
@@ -451,8 +460,10 @@ void CommLinkPerformance(void)
          L = &CommLink[Il];
          
          LinkGeometry(L);
-         TxPerformance(L);
-         RxPerformance(L);
+         
+         L->TxAntGain = AntGain(&L->TxAntPatt,L->TxCAN,L->TxPathDirN);
+         L->RxAntGain = AntGain(&L->RxAntPatt,L->RxCAN,L->RxPathDirN);
+
          AtmoLossModel(L);
                   
          /* [1](4.6) */
@@ -467,7 +478,8 @@ void CommLinkPerformance(void)
          L->Loss = L->FreeSpacePathLoss + L->AtmoPathLoss;
 
          /* [1](4.31),(4.55) */
-         L->Carrier = L->EIRP + L->RxAntGain - L->Loss;
+         if (L->PathIsOcculted) L->Carrier = L->NoiseFloor;
+         else L->Carrier = L->EIRP + L->RxAntGain - L->Loss;
          
          L->Noise = L->RxNoisePower;
                   
