@@ -733,8 +733,10 @@
             {
                "Variable Name": "Doppler",
                "I/O Role": "OUTPUT",
+               "IPC Role": "TxRx",
                "Data Type": "double",
-               "Description": "Frequency shift ratio"
+               "Units": "Hz",
+               "Description": "Carrier Frequency Shift"
             },
             {
                "Variable Name": "Loss",
@@ -745,12 +747,14 @@
             {
                "Variable Name": "Delay",
                "I/O Role": "OUTPUT",
+               "IPC Role": "TxRx",
                "Data Type": "double",
                "Units": "sec"
             },
             {
                "Variable Name": "Carrier",
                "I/O Role": "OUTPUT",
+               "IPC Role": "TxRx",
                "Data Type": "double",
                "Units": "dBw"
             },
@@ -763,6 +767,7 @@
             {
                "Variable Name": "CNR",
                "I/O Role": "OUTPUT",
+               "IPC Role": "TxRx",
                "Data Type": "double",
                "Units": "dB",
                "Description": "Carrier to Noise ratio"
@@ -782,12 +787,14 @@
             {
                "Variable Name": "Range",
                "I/O Role": "OUTPUT",
+               "IPC Role": "TxRx",
                "Data Type": "double",
                "Units": "m"
             },
             {
                "Variable Name": "RangeRate",
                "I/O Role": "OUTPUT",
+               "IPC Role": "TxRx",
                "Data Type": "double",
                "Units": "m/s"
             },
@@ -816,6 +823,7 @@
             {
                "Variable Name": "PathIsOcculted",
                "I/O Role": "OUTPUT",
+               "IPC Role": "TxRx",
                "Data Type": "long"
             },
             {

@@ -1096,23 +1096,24 @@ struct AntPattType {
 
 struct CommLinkType {
    /*~ Outputs ~*/
-   double Doppler; /* Frequency shift ratio */
+   double Doppler; /* Carrier Frequency Shift [[Hz]] [~=~] */
    double Loss; /* [[dB]] */
-   double Delay; /* [[sec]] */
-   double Carrier; /* [[dBw]] */
+   double Delay; /* [[sec]] [~=~] */
+   double Carrier; /* [[dBw]] [~=~] */
    double Noise; /* [[dBw]] */
-   double CNR; /* Carrier to Noise ratio [[dB]] */
+   double CNR; /* Carrier to Noise ratio [[dB]] [~=~] */
    double EIRP; /* [[dBw]] */
    double PowerFluxDensity; /* [[dBw]] */ 
-   double Range; /* [[m]] */
-   double RangeRate; /* [[m/s]] */
+   double Range; /* [[m]] [~=~] */
+   double RangeRate; /* [[m/s]] [~=~] */
    double TxAntGain; /* [[dB]] */
    double RxAntGain; /* [[dB]] */
    long TxOcculted;
    long RxOcculted;
-   long PathIsOcculted;
+   long PathIsOcculted; /* [~=~] */
 
    /*~ Internal Variables ~*/
+   long Exists;
    long Init;
    long MaxOutCtr;
    long OutCtr;

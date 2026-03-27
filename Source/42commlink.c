@@ -362,6 +362,8 @@ void LoadLinkFile(void)
          fscanf(infile,"%[^\n] %[\n]",junk,&newline);  
          fscanf(infile,"%[^\n] %[\n]",junk,&newline); 
 
+         fscanf(infile,"%s %[^\n] %[\n]",response,junk,&newline);
+         L->Exists = DecodeString(response);
          fscanf(infile,"%s %lf  %[^\n] %[\n]",response,&dt,junk,&newline);
          L->OutEnabled = DecodeString(response);
          if (dt < DTSIM) {
