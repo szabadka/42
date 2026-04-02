@@ -310,7 +310,7 @@ void Report(void)
       double PosW[3],VelW[3];
       double CRL[3][3] = {{1.0,0.0,0.0},{0.0,1.0,0.0},{0.0,0.0,1.0}};
       //double SMA,ecc,inc,RAAN,ArgP,anom,tp,SLR,alpha,rmin,MeanMotion,Period;
-      char s[40];
+      char s[80];
       char Fmt[40];
       //double ZAxis[3] = {0.0,0.0,1.0};
 
