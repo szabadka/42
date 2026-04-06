@@ -494,6 +494,9 @@ void InitOrbit(struct OrbitType *O)
       long Success;
       long NodeYear,NodeMonth,NodeDay,NodeHour,NodeMin;
       double NodeSec;
+      char SplineLine[256];
+      long NumScanned;
+      char sep;
 
       infile = FileOpen(InOutPath,O->FileName,"r");
 
@@ -697,12 +700,24 @@ void InitOrbit(struct OrbitType *O)
             else if (ElementType == INP_SPLINE) {
                O->SplineFile = FileOpen(InOutPath,ElementFileName,"rt");
                O->SplineActive = TRUE;
-               for(i=0;i<4;i++) {
-                  fscanf(O->SplineFile," %ld:%ld:%ld:%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]",
-                     &NodeYear,&NodeMonth,&NodeDay,&NodeHour,&NodeMin,&NodeSec,
+               strcpy(O->SplineFmt," %ld%[/:-]%ld%[/:-]%ld%[/:T-]%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]");
+               i = 0;
+               NumScanned = 0;
+               while (NumScanned != 15) { /* Discard any header lines */
+                  fgets(SplineLine,255,O->SplineFile);
+                  NumScanned = sscanf(SplineLine,O->SplineFmt,
+                     &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                     &NodeHour,&NodeMin,&NodeSec,
                      &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
-                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2],
-                     &newline);
+                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+               }
+               for(i=1;i<4;i++) {
+                  fgets(SplineLine,255,O->SplineFile);
+                  sscanf(SplineLine,O->SplineFmt,
+                     &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                     &NodeHour,&NodeMin,&NodeSec,
+                     &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
                   O->NodeDynTime[i] = DateToTime(NodeYear,NodeMonth,NodeDay,
                      NodeHour,NodeMin,NodeSec);
                   O->NodeDynTime[i] += DynTime-CivilTime; /* Adjust from UTC to TT */
@@ -818,12 +833,25 @@ void InitOrbit(struct OrbitType *O)
             }
             else if (ElementType == INP_SPLINE) {
                O->SplineFile = FileOpen(InOutPath,ElementFileName,"rt");
-               for(i=0;i<4;i++) {
-                  fscanf(O->SplineFile," %ld:%ld:%ld:%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]",
-                     &NodeYear,&NodeMonth,&NodeDay,&NodeHour,&NodeMin,&NodeSec,
+               O->SplineActive = TRUE;
+               strcpy(O->SplineFmt," %ld%[/:-]%ld%[/:-]%ld%[/:T-]%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]");
+               i = 0;
+               NumScanned = 0;
+               while (NumScanned != 15) { /* Discard any header lines */
+                  fgets(SplineLine,255,O->SplineFile);
+                  NumScanned = sscanf(SplineLine,O->SplineFmt,
+                     &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                     &NodeHour,&NodeMin,&NodeSec,
                      &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
-                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2],
-                     &newline);
+                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+               }
+               for(i=1;i<4;i++) {
+                  fgets(SplineLine,255,O->SplineFile);
+                  sscanf(SplineLine,O->SplineFmt,
+                     &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                     &NodeHour,&sep,&NodeMin,&sep,&NodeSec,
+                     &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
                   O->NodeDynTime[i] = DateToTime(NodeYear,NodeMonth,NodeDay,
                      NodeHour,NodeMin,NodeSec);
                   for(j=0;j<3;j++) {

@@ -397,6 +397,7 @@ void SplineToPosVel(struct OrbitType *O)
       long i,j,k;
       double X[4],Y[4];
       double x[3],v[3],xn[3],vn[3];
+      char sep;
 
 /* .. Get nodes from O->SplineFile */
       while(DynTime > O->NodeDynTime[2]) {
@@ -407,8 +408,9 @@ void SplineToPosVel(struct OrbitType *O)
                O->NodeVel[i][j] = O->NodeVel[i+1][j];
             }
          }
-         fscanf(O->SplineFile," %ld:%ld:%ld:%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]",
-                  &NodeYear,&NodeMonth,&NodeDay,&NodeHour,&NodeMin,&NodeSec,
+         fscanf(O->SplineFile,O->SplineFmt,
+                  &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                  &NodeHour,&NodeMin,&NodeSec,
                   &O->NodePos[3][0],&O->NodePos[3][1],&O->NodePos[3][2],
                   &O->NodeVel[3][0],&O->NodeVel[3][1],&O->NodeVel[3][2],
                   &newline);

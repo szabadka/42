@@ -177,6 +177,7 @@ struct OrbitType {
    double NodeDynTime[4]; /* Sec since J2000 (TT) */
    double NodePos[4][3];
    double NodeVel[4][3];
+   char SplineFmt[80];
    /* Chebyshev Coefficients */
    long Ncheb;
    struct Cheb3DType *Cheb;
