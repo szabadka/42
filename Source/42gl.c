@@ -3759,6 +3759,7 @@ void FindSphereWindowAxes(double C[3][3])
          }
       }
 
+      center = 0;
       for (i=6; i<10; i++) {
          if (W->Spot[i].Selected == 1) {
             center = i - 6;
@@ -4691,6 +4692,10 @@ void Load3DNoise(void)
 
       N = 256*256*256*4;
       Tex = (GLubyte *) calloc(N,sizeof(GLubyte));
+      if (Tex==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       for(i=0;i<N;i++) Tex[i] = (GLubyte) fgetc(infile);
       fclose(infile);
 
@@ -4784,6 +4789,10 @@ GLuint LoadSpectrum(const char *SpectrumName)
 
 /* .. Save into 1-D texture */
       Tex = (GLubyte *) calloc(256*4,sizeof(GLubyte));
+      if (Tex==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       for(i=0;i<256;i++) {
          f = ((double) i)/255.0;
          r = (GLubyte) (LinInterp(F,R,f,N)+0.5);

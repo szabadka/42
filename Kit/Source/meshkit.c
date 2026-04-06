@@ -393,6 +393,10 @@ long KDRayHitsLeaf(double Source[3], double DirVec[3],
       for(Ip=0;Ip<KD->Npoly;Ip++) {
          P = &M->Poly[KD->Poly[Ip]];
          Vtx = (double **) calloc(P->Nv,sizeof(double *));
+         if (Vtx==NULL) {
+            printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+            exit(1);
+         }
          for(Iv=0;Iv<P->Nv;Iv++) {
             Vtx[Iv] = M->V[P->V[Iv]];
          }
@@ -558,7 +562,15 @@ void SplitKDNode(struct KDNodeType *KD,struct MeshType *M)
       /* Create child nodes */
       Axis = (KD->Axis+1)%3;
       KD->LowChild = (struct KDNodeType *) calloc(1,sizeof(struct KDNodeType));
+      if (KD->LowChild==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       KD->HighChild = (struct KDNodeType *) calloc(1,sizeof(struct KDNodeType));
+      if (KD->HighChild==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       LC = KD->LowChild;
       HC = KD->HighChild;
       LC->Parent = KD;
@@ -639,6 +651,10 @@ void LoadKDTree(struct MeshType *M)
 
 /* .. Root Node coincides with Mesh's Bounding Box */
       M->KDTree = (struct KDNodeType *) calloc(1,sizeof(struct KDNodeType));
+      if (M->KDTree==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       KD = M->KDTree;
       KD->IsRoot = 1;
       KD->IsLeaf = 0;
@@ -676,6 +692,10 @@ void LoadOctree(struct MeshType *M)
       BB = &M->BBox;
 
       M->Octree = (struct OctreeType *) calloc(1,sizeof(struct OctreeType));
+      if (M->Octree==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       O = M->Octree;
 
 /* .. Assign children */

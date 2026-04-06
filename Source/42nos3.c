@@ -92,6 +92,10 @@ static void ReadNos3InpFile(void)
     if (First) {
         First = 0;
         FileName = (char *) calloc(strlen(InOutPath) + strlen(File) + 1, sizeof(char));
+         if (FileName==NULL) {
+            printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+            exit(1);
+         }
         strcpy(FileName, InOutPath);
         strcat(FileName, File);
         infile = fopen(FileName, "r");

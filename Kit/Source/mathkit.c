@@ -984,6 +984,10 @@ void LINSOLVE(double **A, double *x, double *b, long n)
       }
 
       a1 = (double *) calloc(n,sizeof(double));
+      if (a1==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
 
       for(j=0;j<n-1;j++){
          mm = fabs(A[j][j]);
@@ -1048,8 +1052,16 @@ void CholeskySolve(double **A, double *x, double *b, long n)
 
       L = CreateMatrix(n,n);
       D = (double *) calloc(n,sizeof(double));
+      if (D==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       LD = CreateMatrix(n,n);
       y = (double *) calloc(n,sizeof(double));
+      if (y==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
 
 /* .. Find L, D */
       for(j=0;j<n;j++) {
@@ -1097,8 +1109,20 @@ void ConjGradSolve(double **A, double *x, double *b, long n,
       long i,j,Iter;
 
       r = (double *) calloc(n,sizeof(double));
+      if (r==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       d = (double *) calloc(n,sizeof(double));
+      if (d==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       q = (double *) calloc(n,sizeof(double));
+      if (q==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
 
 /* .. r = b - A*x, d = r, DeltaNew = r'*r */
       DeltaNew = 0.0;
@@ -1171,7 +1195,15 @@ void Bairstow(long n, double *a, double Tol, double *Real, double *Imag)
       long i;
 
       b = (double *) calloc(n+1,sizeof(double));
+      if (b==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       c = (double *) calloc(n+1,sizeof(double));
+      if (c==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
 
       while (n > 2) {
 
@@ -1278,11 +1310,33 @@ double Amoeba(long N, double *P,
       long i,j;
 
       p = (double **) calloc(N+1,sizeof(double *));
-      for(i=0;i<N+1;i++) p[i] = (double *) calloc(N,sizeof(double));
+      if (p==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
+      for(i=0;i<N+1;i++) {
+         p[i] = (double *) calloc(N,sizeof(double));
+         if (p[i]==NULL) {
+            printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+            exit(1);
+         }
+      }
 
       pc = (double *) calloc(N,sizeof(double));
+      if (pc==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       f = (double *) calloc(N+1,sizeof(double));
+      if (f==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       pn = (double *) calloc(N,sizeof(double));
+      if (pn==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
 
       /* Simplex */
       for(j=0;j<N;j++) p[0][j] = P[j];
@@ -1784,7 +1838,15 @@ void FindChebyCoefs(double *u, double *P, long Nu, long Nc, double Coef[20])
       
       AtA = CreateMatrix(Nc,Nc);
       x = (double *) calloc(Nc,sizeof(double));
+      if (x==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       Atb = (double *) calloc(Nc,sizeof(double));
+      if (Atb==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       
       for(k=0;k<Nu;k++) {
          ChebyPolys(u[k],Nc,T,U);

@@ -107,6 +107,10 @@ double *PpmToPsf(const char *path, const char *filename,
       fscanf(infile,"%ld %ld\n%ld\n",&Nw,&Nh,&junk);
       N = Nw*Nh*Nb;
       PSF = (double *) calloc(N,sizeof(double));
+      if (PSF==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       for(i=0;i<N;i++) {
          PSF[i] = ((double) fgetc(infile))/255.0;
       }

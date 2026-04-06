@@ -1963,7 +1963,15 @@ void XYZ2LagModes(double TimeSinceEpoch, struct LagrangeSystemType *LS,
 
       COEF = CreateMatrix(8,8);
       RHS = (double *) calloc(8,sizeof(double));
+      if (RHS==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
       ParmVec = (double *) calloc(8,sizeof(double));
+      if (ParmVec==NULL) {
+         printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+         exit(1);
+      }
 
       LP = &LS->LP[O->LP];
 

@@ -1466,6 +1466,10 @@ void InitFlexModes(struct SCType *S)
 
             /* Non-zero Elements of Linear Modal Integral, L, 3 x 3 x Nf */
             L = (double ***) calloc(3,sizeof(double **));
+            if (L==NULL) {
+               printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+               exit(1);
+            }
             for(i=0;i<3;i++) L[i] = CreateMatrix(3,B->Nf);
             fscanf(infile,"%[^\n] %[\n]",junk,&newline);
             fscanf(infile,"%ld %[^\n] %[\n]",&Nnonzero,junk,&newline);
@@ -1495,6 +1499,10 @@ void InitFlexModes(struct SCType *S)
 
             /* Non-zero Elements of Angular Modal Integral, N, 3 x 3 x Nf x Nf*/
             N = (double ****) calloc(3,sizeof(double ***));
+            if (N==NULL) {
+               printf("Allocation failed in %s:%d\n",__FILE__,__LINE__);
+               exit(1);
+            }
             for(i=0;i<3;i++) {
                N[i] = (double ***) calloc(3,sizeof(double **));
                for(j=0;j<3;j++) {
