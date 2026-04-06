@@ -391,9 +391,8 @@ void CheckChangeOfOrbitWorld(struct OrbitType *O)
 /**********************************************************************/
 void SplineToPosVel(struct OrbitType *O)
 {
-      long NodeYear,NodeMonth,NodeDay,NodeHour,NodeMin;
+      long NodeYear,NodeDOY,NodeMonth,NodeDay,NodeHour,NodeMin;
       double NodeSec;
-      char newline;
       long i,j,k;
       double X[4],Y[4];
       double x[3],v[3],xn[3],vn[3];
@@ -408,19 +407,28 @@ void SplineToPosVel(struct OrbitType *O)
                O->NodeVel[i][j] = O->NodeVel[i+1][j];
             }
          }
-         fscanf(O->SplineFile,O->SplineFmt,
-                  &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
-                  &NodeHour,&NodeMin,&NodeSec,
-                  &O->NodePos[3][0],&O->NodePos[3][1],&O->NodePos[3][2],
-                  &O->NodeVel[3][0],&O->NodeVel[3][1],&O->NodeVel[3][2],
-                  &newline);
-               O->NodeDynTime[3] = DateToTime(NodeYear,NodeMonth,NodeDay,
-                  NodeHour,NodeMin,NodeSec);
-               O->NodeDynTime[3] += DynTime-CivilTime; /* Adjust from UTC to TT */
-               for(j=0;j<3;j++) {
-                  O->NodePos[3][j] *= 1000.0;
-                  O->NodeVel[3][j] *= 1000.0;
-               }
+         if (O->SplineDateFormat == DATE_MON_DAY) {
+            fscanf(O->SplineFile,O->SplineFmt,
+               &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+               &NodeHour,&NodeMin,&NodeSec,
+               &O->NodePos[3][0],&O->NodePos[3][1],&O->NodePos[3][2],
+               &O->NodeVel[3][0],&O->NodeVel[3][1],&O->NodeVel[3][2]);
+         }
+         else {
+            fscanf(O->SplineFile,O->SplineFmt,
+               &NodeYear,&sep,&NodeDOY,&sep,
+               &NodeHour,&NodeMin,&NodeSec,
+               &O->NodePos[3][0],&O->NodePos[3][1],&O->NodePos[3][2],
+               &O->NodeVel[3][0],&O->NodeVel[3][1],&O->NodeVel[3][2]);
+            DOY2MD(NodeYear,NodeDOY,&NodeMonth,&NodeDay);
+         }
+         O->NodeDynTime[3] = DateToTime(NodeYear,NodeMonth,NodeDay,
+            NodeHour,NodeMin,NodeSec);
+         O->NodeDynTime[3] += DynTime-CivilTime; /* Adjust from UTC to TT */
+         for(j=0;j<3;j++) {
+            O->NodePos[3][j] *= 1000.0;
+            O->NodeVel[3][j] *= 1000.0;
+         }
          if (feof(O->SplineFile)) {
             printf("Oops.  Reached end of Spline file.\n");
             exit(1);

@@ -492,11 +492,13 @@ void InitOrbit(struct OrbitType *O)
       char ElementLabel[40];
       char ElementFileName[40];
       long Success;
-      long NodeYear,NodeMonth,NodeDay,NodeHour,NodeMin;
+      long NodeYear,NodeDOY,NodeMonth,NodeDay,NodeHour,NodeMin;
       double NodeSec;
       char SplineLine[256];
-      long NumScanned;
+      long NumMonDay,NumDOY;
       char sep;
+      char MonDayFmt[120] = " %4ld%[ ,/:-]%ld%[ ,/:-]%ld%[ ,/:T-]%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]";
+      char DOYFmt[120] =    " %4ld%[ ,/:-]%ld%[ ,/:T-]%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]";
 
       infile = FileOpen(InOutPath,O->FileName,"r");
 
@@ -700,24 +702,48 @@ void InitOrbit(struct OrbitType *O)
             else if (ElementType == INP_SPLINE) {
                O->SplineFile = FileOpen(InOutPath,ElementFileName,"rt");
                O->SplineActive = TRUE;
-               strcpy(O->SplineFmt," %ld%[/:-]%ld%[/:-]%ld%[/:T-]%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]");
                i = 0;
-               NumScanned = 0;
-               while (NumScanned != 15) { /* Discard any header lines */
+               NumMonDay = 0;
+               NumDOY = 0;
+               while (NumMonDay != 15 && NumDOY != 13) { /* Discard any header lines */
                   fgets(SplineLine,255,O->SplineFile);
-                  NumScanned = sscanf(SplineLine,O->SplineFmt,
+                  NumMonDay = sscanf(SplineLine,MonDayFmt,
                      &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                     &NodeHour,&NodeMin,&NodeSec,
+                     &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                  NumDOY = sscanf(SplineLine,DOYFmt,
+                     &NodeYear,&sep,&NodeDOY,&sep,
                      &NodeHour,&NodeMin,&NodeSec,
                      &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
                      &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
                }
+               if (NumMonDay == 15) {
+                  O->SplineDateFormat = DATE_MON_DAY;
+                  strcpy(O->SplineFmt,MonDayFmt);
+               }
+               else {
+                  O->SplineDateFormat = DATE_DOY;
+                  strcpy(O->SplineFmt,DOYFmt);
+                  DOY2MD(NodeYear,NodeDOY,&NodeMonth,&NodeDay);                  
+               }
                for(i=1;i<4;i++) {
                   fgets(SplineLine,255,O->SplineFile);
-                  sscanf(SplineLine,O->SplineFmt,
-                     &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
-                     &NodeHour,&NodeMin,&NodeSec,
-                     &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
-                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                  if (O->SplineDateFormat == DATE_MON_DAY) {
+                     sscanf(SplineLine,O->SplineFmt,
+                        &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                        &NodeHour,&NodeMin,&NodeSec,
+                        &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                        &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                  }
+                  else {
+                     sscanf(SplineLine,O->SplineFmt,
+                        &NodeYear,&sep,&NodeDOY,&sep,
+                        &NodeHour,&NodeMin,&NodeSec,
+                        &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                        &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                     DOY2MD(NodeYear,NodeDOY,&NodeMonth,&NodeDay);                  
+                  }
                   O->NodeDynTime[i] = DateToTime(NodeYear,NodeMonth,NodeDay,
                      NodeHour,NodeMin,NodeSec);
                   O->NodeDynTime[i] += DynTime-CivilTime; /* Adjust from UTC to TT */
@@ -834,24 +860,48 @@ void InitOrbit(struct OrbitType *O)
             else if (ElementType == INP_SPLINE) {
                O->SplineFile = FileOpen(InOutPath,ElementFileName,"rt");
                O->SplineActive = TRUE;
-               strcpy(O->SplineFmt," %ld%[/:-]%ld%[/:-]%ld%[/:T-]%ld:%ld:%lf %lf %lf %lf %lf %lf %lf %[\n]");
                i = 0;
-               NumScanned = 0;
-               while (NumScanned != 15) { /* Discard any header lines */
+               NumMonDay = 0;
+               NumDOY = 0;
+               while (NumMonDay != 15 && NumDOY != 13) { /* Discard any header lines */
                   fgets(SplineLine,255,O->SplineFile);
-                  NumScanned = sscanf(SplineLine,O->SplineFmt,
+                  NumMonDay = sscanf(SplineLine,MonDayFmt,
                      &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
                      &NodeHour,&NodeMin,&NodeSec,
                      &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
                      &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                  NumDOY = sscanf(SplineLine,DOYFmt,
+                     &NodeYear,&sep,&NodeDOY,&sep,
+                     &NodeHour,&NodeMin,&NodeSec,
+                     &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+               }
+               if (NumMonDay == 15) {
+                  O->SplineDateFormat = DATE_MON_DAY;
+                  strcpy(O->SplineFmt,MonDayFmt);
+               }
+               else {
+                  O->SplineDateFormat = DATE_DOY;
+                  strcpy(O->SplineFmt,DOYFmt);
+                  DOY2MD(NodeYear,NodeDOY,&NodeMonth,&NodeDay);                  
                }
                for(i=1;i<4;i++) {
                   fgets(SplineLine,255,O->SplineFile);
-                  sscanf(SplineLine,O->SplineFmt,
-                     &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
-                     &NodeHour,&sep,&NodeMin,&sep,&NodeSec,
-                     &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
-                     &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                  if (O->SplineDateFormat == DATE_MON_DAY) {
+                     sscanf(SplineLine,O->SplineFmt,
+                        &NodeYear,&sep,&NodeMonth,&sep,&NodeDay,&sep,
+                        &NodeHour,&NodeMin,&NodeSec,
+                        &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                        &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                  }
+                  else {
+                     sscanf(SplineLine,O->SplineFmt,
+                        &NodeYear,&sep,&NodeDOY,&sep,
+                        &NodeHour,&NodeMin,&NodeSec,
+                        &O->NodePos[i][0],&O->NodePos[i][1],&O->NodePos[i][2],
+                        &O->NodeVel[i][0],&O->NodeVel[i][1],&O->NodeVel[i][2]);
+                     DOY2MD(NodeYear,NodeDOY,&NodeMonth,&NodeDay);                  
+                  }
                   O->NodeDynTime[i] = DateToTime(NodeYear,NodeMonth,NodeDay,
                      NodeHour,NodeMin,NodeSec);
                   for(j=0;j<3;j++) {

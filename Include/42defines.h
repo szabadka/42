@@ -324,4 +324,8 @@
 #define DOWNLINK 1
 #define CROSSLINK 2
 
+/* Spline input file date format */
+#define DATE_MON_DAY 0
+#define DATE_DOY 1
+
 #endif /* __42DEFINES_H__ */
