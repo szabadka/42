@@ -325,7 +325,7 @@ void Report(void)
          ConstraintFile = (FILE **) calloc(Nsc,sizeof(FILE *));
          for(Isc=0;Isc<Nsc;Isc++) {
             if (SC[Isc].Exists) {
-               if (Nsc == 1) sprintf(Fmt,"");
+               if (Nsc == 1) strcpy(Fmt,"\0");
                else if (Nsc <= 10) sprintf(Fmt,"%1ld",Isc);
                else sprintf(Fmt,"%02ld",Isc);
                sprintf(s,"u%s.42",Fmt);

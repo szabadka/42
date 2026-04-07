@@ -915,7 +915,7 @@ long OCProjectRayOntoMesh(double Point[3],double DirVec[3],
       return(FoundPoly);
 }
 /*********************************************************************/
-struct MeshType *LoadWingsObjFile(const char ModelPath[80],const char ObjFilename[40],
+struct MeshType *LoadWingsObjFile(const char *ModelPath,const char *ObjFilename,
                        struct MatlType **MatlPtr, long *Nmatl,
                        struct MeshType *Mesh, long *Nmesh, long *MeshTag,
                        long EdgesEnabled)
@@ -1306,8 +1306,8 @@ struct MeshType *LoadWingsObjFile(const char ModelPath[80],const char ObjFilenam
 #undef D2R
 }
 /*********************************************************************/
-void WriteMeshToObjFile(struct MatlType *Matl,struct MeshType *Mesh,const char Path[80],
-   const char FileName[40])
+void WriteMeshToObjFile(struct MatlType *Matl,struct MeshType *Mesh,const char *Path,
+   const char *FileName)
 {
       char MtlFileName[80],ObjFileName[80];
       FILE *MtlFile,*ObjFile;

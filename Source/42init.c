@@ -264,7 +264,7 @@ void EchoDyn(struct SCType *S)
       struct JointType *G;
       long i,j,Ib,Ig,Nf;
 
-      if (Nsc == 1) sprintf(Fmt,"");
+      if (Nsc == 1) strcpy(Fmt,"\0");
       else if (Nsc <= 10) sprintf(Fmt,"%1ld",S->ID);
       else sprintf(Fmt,"%02ld",S->ID);
       sprintf(OutFileName,"Dyn%s.42",Fmt);
@@ -1132,7 +1132,7 @@ void InitRigidDyn(struct SCType *S)
       MapJointStatesToStateVector(S);
 
 /* .. Echo tree tables */
-      if (Nsc == 1) sprintf(Fmt,"");
+      if (Nsc == 1) strcpy(Fmt,"\0");
       else if (Nsc <= 10) sprintf(Fmt,"%1ld",S->ID);
       else sprintf(Fmt,"%02ld",S->ID);
       sprintf(filename,"Tree%s.42",Fmt);
